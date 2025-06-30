@@ -1,5 +1,5 @@
 # Container orchestration tool (docker-compose or podman-compose)
-COMPOSE = docker-compose
+COMPOSE?=docker-compose
 
 .PHONY: setup run test clean help db-up db-down db-logs db-shell
 
@@ -22,16 +22,17 @@ setup:
 	@echo "Waiting for database to be ready..."
 	@sleep 5
 	@echo "Setup complete!"
+	@mix deps.get
+	@mix ecto.migrate
 
 run:
 	@echo "Running the application..."
 	@./bin/start.sh
 
-test:
+# NOTE(grant): We need to be running the server already, so we probably
+# don't want to start the database again
+test: setup
 	@echo "Running tests..."
-	@echo "Starting test database if not running..."
-	@$(COMPOSE) up -d
-	@echo "Running test script..."
 	@./bin/test.sh
 
 clean:
