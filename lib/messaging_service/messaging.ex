@@ -15,9 +15,8 @@ defmodule MessagingService.Messaging do
   @spec insert_text(map()) :: {:ok, Message.t()} | {:error, Ecto.Changeset.t()}
   def insert_text(%{} = params) do
     Repo.transact(fn ->
-      with {:ok, conversation} <- lookup_conversation(params["from"], params["to"]),
-           params = Map.put(params, "conversation_id", conversation.id) do
-        %Message{}
+      with {:ok, conversation} <- lookup_conversation(params["from"], params["to"]) do
+        Ecto.build_assoc(conversation, :messages)
         |> Message.text_changeset(params)
         |> Repo.insert()
       end
