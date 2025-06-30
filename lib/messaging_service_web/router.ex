@@ -18,6 +18,7 @@ defmodule MessagingServiceWeb.Router do
   end
 
   scope "/api/conversations", MessagingServiceWeb do
+    pipe_through :api
     get "/", ConversationController, :index
     get "/:id/messages", ConversationController, :show
   end
