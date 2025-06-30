@@ -17,12 +17,12 @@ defmodule MessagingService.Messaging.Message do
     # This works for now, but we may want to store additional information about the attachments in the future.
     # For example, we may want to save the url to the attachment, the attachment's size, etc.
     # In that case, we should change this to be a one-to-many relationship with a separate attachments table.
-    field :attachments, {:array, :string}
     field :provider_message_id, :string
 
     # NIT: should probably be `:provider_timestamp`
     field :timestamp, :utc_datetime
 
+    has_many :attachments, MessagingService.Messaging.Attachment
     belongs_to :conversation, MessagingService.Messaging.Conversation
 
     timestamps(type: :utc_datetime, updated_at: false)
@@ -60,12 +60,12 @@ defmodule MessagingService.Messaging.Message do
       :to,
       :type,
       :body,
-      :attachments,
       :provider,
       :provider_message_id,
       :timestamp,
       :conversation_id
     ])
+    |> cast_assoc(:attachments, with: &MessagingService.Messaging.Attachment.changeset/2)
     |> validate_required([:from, :to, :type, :body, :provider, :timestamp])
   end
 end

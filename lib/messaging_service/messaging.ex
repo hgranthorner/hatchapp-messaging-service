@@ -16,6 +16,8 @@ defmodule MessagingService.Messaging do
   def insert_text(%{} = params) do
     Repo.transact(fn ->
       with {:ok, conversation} <- lookup_conversation(params["from"], params["to"]) do
+        params = Map.put(params, "attachments", validate_attachments(params))
+
         Ecto.build_assoc(conversation, :messages)
         |> Message.text_changeset(params)
         |> Repo.insert()
@@ -26,9 +28,10 @@ defmodule MessagingService.Messaging do
   @spec insert_email(map()) :: {:ok, Message.t()} | {:error, Ecto.Changeset.t()}
   def insert_email(%{} = params) do
     Repo.transact(fn ->
-      with {:ok, conversation} <- lookup_conversation(params["from"], params["to"]),
-           params = Map.put(params, "conversation_id", conversation.id) do
-        %Message{}
+      with {:ok, conversation} <- lookup_conversation(params["from"], params["to"]) do
+        params = Map.put(params, "attachments", validate_attachments(params))
+
+        Ecto.build_assoc(conversation, :messages)
         |> Message.email_changeset(params)
         |> Repo.insert()
       end
@@ -58,10 +61,18 @@ defmodule MessagingService.Messaging do
 
   @spec get_conversation(String.t()) :: {:ok, Conversation.t()} | {:error, :not_found}
   def get_conversation(conversation_id) do
-    Repo.get(preload(Conversation, :messages), conversation_id)
+    Repo.get(preload(Conversation, messages: :attachments), conversation_id)
     |> case do
       nil -> {:error, :not_found}
       conversation -> {:ok, conversation}
+    end
+  end
+
+  defp validate_attachments(params) do
+    if params["attachments"] do
+      Enum.map(params["attachments"], fn url -> %{"url" => url} end)
+    else
+      []
     end
   end
 end

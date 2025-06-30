@@ -16,13 +16,20 @@ defmodule MessagingServiceWeb.MessageJSON do
   end
 
   def data(%Message{} = message) do
+    attachments =
+      if message.type == :mms do
+        for(%{url: url} <- message.attachments, do: url)
+      else
+        nil
+      end
+
     %{
       id: message.id,
       from: message.from,
       to: message.to,
       type: message.type,
       body: message.body,
-      attachments: message.attachments,
+      attachments: attachments,
       provider: message.provider,
       provider_message_id: message.provider_message_id
     }
