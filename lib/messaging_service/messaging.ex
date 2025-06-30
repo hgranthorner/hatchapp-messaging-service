@@ -14,22 +14,26 @@ defmodule MessagingService.Messaging do
   """
   @spec insert_text(map()) :: {:ok, Message.t()} | {:error, Ecto.Changeset.t()}
   def insert_text(%{} = params) do
-    with {:ok, conversation} <- lookup_conversation(params["from"], params["to"]),
-         params = Map.put(params, "conversation_id", conversation.id) do
-      %Message{}
-      |> Message.text_changeset(params)
-      |> Repo.insert()
-    end
+    Repo.transact(fn ->
+      with {:ok, conversation} <- lookup_conversation(params["from"], params["to"]),
+           params = Map.put(params, "conversation_id", conversation.id) do
+        %Message{}
+        |> Message.text_changeset(params)
+        |> Repo.insert()
+      end
+    end)
   end
 
   @spec insert_email(map()) :: {:ok, Message.t()} | {:error, Ecto.Changeset.t()}
   def insert_email(%{} = params) do
-    with {:ok, conversation} <- lookup_conversation(params["from"], params["to"]),
-         params = Map.put(params, "conversation_id", conversation.id) do
-      %Message{}
-      |> Message.email_changeset(params)
-      |> Repo.insert()
-    end
+    Repo.transact(fn ->
+      with {:ok, conversation} <- lookup_conversation(params["from"], params["to"]),
+           params = Map.put(params, "conversation_id", conversation.id) do
+        %Message{}
+        |> Message.email_changeset(params)
+        |> Repo.insert()
+      end
+    end)
   end
 
   @spec lookup_conversation(String.t(), String.t()) ::

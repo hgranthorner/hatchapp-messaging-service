@@ -9,6 +9,8 @@ defmodule MessagingService.Repo.Migrations.CreateConversations do
       timestamps(type: :utc_datetime)
     end
 
+    create index(:conversations, [:user_1, :user_2])
+
     alter table(:messages) do
       add :conversation_id, references(:conversations, on_delete: :delete_all), null: false
     end

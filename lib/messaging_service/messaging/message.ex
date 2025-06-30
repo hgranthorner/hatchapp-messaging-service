@@ -2,6 +2,8 @@ defmodule MessagingService.Messaging.Message do
   use TypedEctoSchema
   import Ecto.Changeset
 
+  # NOTE(grant): We should probably add a "status" field to keep track
+  # of whether the message has been sent, delivered, read, etc.
   typed_schema "messages" do
     field :type, Ecto.Enum, values: [:sms, :mms, :email]
     field :body, :string
