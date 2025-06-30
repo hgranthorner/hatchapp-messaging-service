@@ -12,6 +12,8 @@ defmodule MessagingService.Messaging.Message do
     field :provider_message_id, :string
     field :timestamp, :utc_datetime
 
+    belongs_to :conversation, MessagingService.Messaging.Conversation
+
     timestamps(type: :utc_datetime, updated_at: false)
   end
 
@@ -44,7 +46,8 @@ defmodule MessagingService.Messaging.Message do
       :attachments,
       :provider,
       :provider_message_id,
-      :timestamp
+      :timestamp,
+      :conversation_id
     ])
     |> validate_required([:from, :to, :type, :body, :provider, :timestamp])
   end
