@@ -4,8 +4,6 @@ defmodule MessagingService.MessagingTest do
   alias MessagingService.Messaging
 
   describe "messages" do
-    alias MessagingService.Messaging.Message
-
     import MessagingService.MessagingFixtures
 
     test "sms" do
