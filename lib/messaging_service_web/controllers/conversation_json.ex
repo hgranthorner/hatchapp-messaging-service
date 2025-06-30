@@ -12,6 +12,8 @@ defmodule MessagingServiceWeb.ConversationJSON do
 
   defp data(%Conversation{} = conversation, opts \\ []) do
     include_messages = Keyword.get(opts, :include_messages, false)
+
+    # NOTE: converting to participants so that we could support more users in a conversation in the future.
     c = %{id: conversation.id, participants: [conversation.user_1, conversation.user_2]}
 
     if include_messages do

@@ -1,6 +1,6 @@
 defmodule MessagingService.Messaging do
   @moduledoc """
-  The Messaging context.
+  The main context for the application. We would want to also add an Account/Authorization context ASAP if this were a real application.
   """
 
   import Ecto.Query, warn: false
@@ -9,6 +9,9 @@ defmodule MessagingService.Messaging do
   alias MessagingService.Messaging.Message
   alias MessagingService.Messaging.Conversation
 
+  @doc """
+  Insert a new SMS or MMS message into the database.
+  """
   @spec insert_text(map()) :: {:ok, Message.t()} | {:error, Ecto.Changeset.t()}
   def insert_text(%{} = params) do
     with {:ok, conversation} <- lookup_conversation(params["from"], params["to"]),

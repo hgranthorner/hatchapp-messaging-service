@@ -8,6 +8,7 @@ defmodule MessagingServiceWeb.ConversationController do
   end
 
   def show(conn, %{"id" => id}) do
+    # TODO: Add authorization check, ensure user is part of the conversation
     {:ok, conversation} = Messaging.get_conversation(id)
     render(conn, "show.json", conversation: conversation)
   end
