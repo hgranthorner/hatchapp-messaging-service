@@ -1,3 +1,6 @@
+# Container orchestration tool (docker-compose or podman-compose)
+COMPOSE = docker-compose
+
 .PHONY: setup run test clean help db-up db-down db-logs db-shell
 
 help:
@@ -15,7 +18,7 @@ help:
 setup:
 	@echo "Setting up the project..."
 	@echo "Starting PostgreSQL database..."
-	@docker-compose up -d
+	@$(COMPOSE) up -d
 	@echo "Waiting for database to be ready..."
 	@sleep 5
 	@echo "Setup complete!"
@@ -27,29 +30,29 @@ run:
 test:
 	@echo "Running tests..."
 	@echo "Starting test database if not running..."
-	@docker-compose up -d
+	@$(COMPOSE) up -d
 	@echo "Running test script..."
 	@./bin/test.sh
 
 clean:
 	@echo "Cleaning up..."
 	@echo "Stopping and removing containers..."
-	@docker-compose down -v
+	@$(COMPOSE) down -v
 	@echo "Removing any temporary files..."
 	@rm -rf *.log *.tmp
 
 db-up:
 	@echo "Starting PostgreSQL database..."
-	@docker-compose up -d
+	@$(COMPOSE) up -d
 
 db-down:
 	@echo "Stopping PostgreSQL database..."
-	@docker-compose down
+	@$(COMPOSE) down
 
 db-logs:
 	@echo "Showing database logs..."
-	@docker-compose logs -f postgres
+	@$(COMPOSE) logs -f postgres
 
 db-shell:
 	@echo "Connecting to database shell..."
-	@docker-compose exec postgres psql -U messaging_user -d messaging_service
+	@$(COMPOSE) exec postgres psql -U messaging_user -d messaging_service

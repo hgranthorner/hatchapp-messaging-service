@@ -6,4 +6,5 @@ echo "Starting the application..."
 echo "Environment: ${ENV:-development}"
 
 # Add your application startup commands here
-echo "Application started successfully!" 
+mix phx.server
+echo "Application started successfully!"
