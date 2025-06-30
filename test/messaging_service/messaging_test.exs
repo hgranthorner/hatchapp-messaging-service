@@ -1,6 +1,6 @@
 defmodule MessagingService.MessagingTest do
   alias Ecto.UUID
-  use MessagingService.DataCase
+  use MessagingService.DataCase, async: true
 
   alias MessagingService.Messaging
 

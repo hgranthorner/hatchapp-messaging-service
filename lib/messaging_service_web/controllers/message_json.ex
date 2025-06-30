@@ -15,7 +15,7 @@ defmodule MessagingServiceWeb.MessageJSON do
     %{data: data(message)}
   end
 
-  defp data(%Message{} = message) do
+  def data(%Message{} = message) do
     %{
       id: message.id,
       from: message.from,

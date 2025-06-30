@@ -5,7 +5,20 @@ defmodule MessagingServiceWeb.Router do
     plug :accepts, ["json"]
   end
 
-  scope "/api", MessagingServiceWeb do
+  scope "/api/messages", MessagingServiceWeb do
     pipe_through :api
+    post "/sms", SmsController, :outgoing
+    post "/email", EmailController, :outgoing
+  end
+
+  scope "/api/webhooks", MessagingServiceWeb do
+    pipe_through :api
+    post "/sms", SmsController, :incoming
+    post "/email", EmailController, :incoming
+  end
+
+  scope "/api/conversations", MessagingServiceWeb do
+    get "/", ConversationController, :index
+    get "/:id/messages", ConversationController, :show
   end
 end
