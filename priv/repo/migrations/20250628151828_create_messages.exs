@@ -10,6 +10,7 @@ defmodule MessagingService.Repo.Migrations.CreateMessages do
       add :attachments, :map
       add :provider, :text, null: false
       add :provider_message_id, :text
+      add :timestamp, :utc_datetime, null: false
 
       timestamps(type: :utc_datetime, updated_at: false)
     end
