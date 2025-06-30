@@ -4,6 +4,7 @@ defmodule MessagingServiceWeb.SmsController do
 
   def incoming(conn, params) do
     # TODO: forward message to user
+    # TODO: validate incoming message comes from provider
     Messaging.insert_text(params)
     send_resp(conn, 200, "OK")
   end
