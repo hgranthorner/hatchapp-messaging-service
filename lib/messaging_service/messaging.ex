@@ -45,4 +45,20 @@ defmodule MessagingService.Messaging do
         {:ok, c}
     end
   end
+
+  def get_conversations() do
+    Repo.all(Conversation)
+    |> Enum.map(fn c ->
+      %{id: c.id, participants: [c.user_1, c.user_2]}
+    end)
+  end
+
+  @spec get_conversation(String.t()) :: {:ok, Conversation.t()} | {:error, :not_found}
+  def get_conversation(conversation_id) do
+    Repo.get(preload(Conversation, :messages), conversation_id)
+    |> case do
+      nil -> {:error, :not_found}
+      conversation -> {:ok, conversation}
+    end
+  end
 end
