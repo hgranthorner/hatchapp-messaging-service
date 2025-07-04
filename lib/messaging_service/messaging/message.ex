@@ -43,12 +43,13 @@ defmodule MessagingService.Messaging.Message do
   def email_changeset(%__MODULE__{} = message, %{} = attrs) do
     attrs =
       attrs
+      |> Map.put_new("type", "email")
       |> Map.put_new("provider_message_id", Map.get(attrs, "xillio_id"))
 
     changeset(message, attrs)
   end
 
-  defp changeset(message, attrs) do
+  def changeset(message, attrs) do
     message
     |> cast(attrs, [
       :from,

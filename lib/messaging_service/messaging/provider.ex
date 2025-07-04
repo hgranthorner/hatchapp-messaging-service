@@ -1,8 +1,8 @@
 defmodule MessagingService.Messaging.Provider do
-  use Ecto.Schema
+  use TypedEctoSchema
   import Ecto.Changeset
 
-  schema "providers" do
+  typed_schema "providers" do
     field :active, :boolean, default: false
     field :name, :string
     field :type, Ecto.Enum, values: [:sms, :mms, :email]

@@ -9,6 +9,7 @@ defmodule MessagingService.Messaging do
   alias MessagingService.Messaging.Message
   alias MessagingService.Messaging.Conversation
   alias MessagingService.Messaging.Provider
+  alias MessagingService.Provider, as: ProviderContext
 
   @doc """
   Insert a new SMS or MMS message into the database.
@@ -72,6 +73,22 @@ defmodule MessagingService.Messaging do
       nil -> {:error, :not_found}
       conversation -> {:ok, conversation}
     end
+  end
+
+  @spec send_message_to_provider(Message.t()) ::
+          {:ok, Message.t()} | {:error, Ecto.Changeset.t()} | {:error, String.t()}
+  def send_message_to_provider(message) do
+    with {:ok, provider_message_id} <- ProviderContext.send_message(message) do
+      update_provider_message_id(message, provider_message_id)
+    end
+  end
+
+  @spec update_provider_message_id(Message.t(), String.t()) ::
+          {:ok, Message.t()} | {:error, Ecto.Changeset.t()}
+  defp update_provider_message_id(message, provider_message_id) do
+    message
+    |> Message.changeset(%{"provider_message_id" => provider_message_id})
+    |> Repo.update()
   end
 
   @spec put_attachments(map()) :: map()
