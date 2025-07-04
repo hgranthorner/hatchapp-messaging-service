@@ -11,9 +11,6 @@ defmodule MessagingService.Messaging.Message do
     field :to, :string
     field :from, :string
 
-    # In a real application this would be a foreign key to a Provider's table, where we may store additional metadata
-    field :provider, :string
-
     # This works for now, but we may want to store additional information about the attachments in the future.
     # For example, we may want to save the url to the attachment, the attachment's size, etc.
     # In that case, we should change this to be a one-to-many relationship with a separate attachments table.
@@ -23,6 +20,7 @@ defmodule MessagingService.Messaging.Message do
     field :timestamp, :utc_datetime
 
     has_many :attachments, MessagingService.Messaging.Attachment
+    belongs_to :provider, MessagingService.Messaging.Provider
     belongs_to :conversation, MessagingService.Messaging.Conversation
 
     timestamps(type: :utc_datetime, updated_at: false)
@@ -34,7 +32,6 @@ defmodule MessagingService.Messaging.Message do
   def text_changeset(%__MODULE__{} = message, %{} = attrs) do
     attrs =
       attrs
-      |> Map.put_new("provider", "messaging_provider")
       |> Map.put_new("provider_message_id", Map.get(attrs, "messaging_provider_id"))
 
     changeset(message, attrs)
@@ -46,9 +43,7 @@ defmodule MessagingService.Messaging.Message do
   def email_changeset(%__MODULE__{} = message, %{} = attrs) do
     attrs =
       attrs
-      |> Map.put_new("provider", "xillio")
       |> Map.put_new("provider_message_id", Map.get(attrs, "xillio_id"))
-      |> Map.put_new("type", "email")
 
     changeset(message, attrs)
   end
@@ -60,7 +55,6 @@ defmodule MessagingService.Messaging.Message do
       :to,
       :type,
       :body,
-      :provider,
       :provider_message_id,
       :timestamp,
       :conversation_id

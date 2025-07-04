@@ -37,6 +37,28 @@ defmodule MessagingService.DataCase do
   """
   def setup_sandbox(tags) do
     pid = Ecto.Adapters.SQL.Sandbox.start_owner!(MessagingService.Repo, shared: not tags[:async])
+    import MessagingService
+    alias MessagingService.Messaging.Provider
+
+    # NOTE(grant): This should be refactored to be pulled from `seed.exs` script
+    MessagingService.Repo.insert!(%Provider{
+      name: "xillio",
+      type: :email,
+      active: true
+    })
+
+    MessagingService.Repo.insert!(%Provider{
+      name: "messaging_provider",
+      type: :sms,
+      active: true
+    })
+
+    MessagingService.Repo.insert!(%Provider{
+      name: "messaging_provider",
+      type: :mms,
+      active: true
+    })
+
     on_exit(fn -> Ecto.Adapters.SQL.Sandbox.stop_owner(pid) end)
   end
 

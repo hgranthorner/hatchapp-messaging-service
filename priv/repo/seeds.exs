@@ -9,3 +9,24 @@
 #
 # We recommend using the bang functions (`insert!`, `update!`
 # and so on) as they will fail if something goes wrong.
+
+import MessagingService
+alias MessagingService.Messaging.Provider
+
+MessagingService.Repo.insert!(%Provider{
+  name: "xillio",
+  type: :email,
+  active: true
+})
+
+MessagingService.Repo.insert!(%Provider{
+  name: "messaging_provider",
+  type: :sms,
+  active: true
+})
+
+MessagingService.Repo.insert!(%Provider{
+  name: "messaging_provider",
+  type: :mms,
+  active: true
+})

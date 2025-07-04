@@ -8,6 +8,7 @@ defmodule MessagingService.Messaging do
 
   alias MessagingService.Messaging.Message
   alias MessagingService.Messaging.Conversation
+  alias MessagingService.Messaging.Provider
 
   @doc """
   Insert a new SMS or MMS message into the database.
@@ -15,10 +16,12 @@ defmodule MessagingService.Messaging do
   @spec insert_text(map()) :: {:ok, Message.t()} | {:error, Ecto.Changeset.t()}
   def insert_text(%{} = params) do
     Repo.transact(fn ->
-      with {:ok, conversation} <- lookup_conversation(params["from"], params["to"]) do
-        params = Map.put(params, "attachments", validate_attachments(params))
+      with {:ok, conversation} <- lookup_conversation(params["from"], params["to"]),
+           {:ok, provider} <- get_provider(params) do
+        params = put_attachments(params)
 
         Ecto.build_assoc(conversation, :messages)
+        |> Map.put(:provider, provider)
         |> Message.text_changeset(params)
         |> Repo.insert()
       end
@@ -28,10 +31,12 @@ defmodule MessagingService.Messaging do
   @spec insert_email(map()) :: {:ok, Message.t()} | {:error, Ecto.Changeset.t()}
   def insert_email(%{} = params) do
     Repo.transact(fn ->
-      with {:ok, conversation} <- lookup_conversation(params["from"], params["to"]) do
-        params = Map.put(params, "attachments", validate_attachments(params))
+      with {:ok, conversation} <- lookup_conversation(params["from"], params["to"]),
+           {:ok, provider} <- get_provider(params) do
+        params = put_attachments(params)
 
         Ecto.build_assoc(conversation, :messages)
+        |> Map.put(:provider, provider)
         |> Message.email_changeset(params)
         |> Repo.insert()
       end
@@ -55,24 +60,40 @@ defmodule MessagingService.Messaging do
     end
   end
 
+  @spec get_conversations() :: {:ok, [Conversation.t()]} | {:error, Ecto.Changeset.t()}
   def get_conversations() do
     Repo.all(Conversation)
   end
 
   @spec get_conversation(String.t()) :: {:ok, Conversation.t()} | {:error, :not_found}
   def get_conversation(conversation_id) do
-    Repo.get(preload(Conversation, messages: :attachments), conversation_id)
+    Repo.get(preload(Conversation, messages: [:attachments, :provider]), conversation_id)
     |> case do
       nil -> {:error, :not_found}
       conversation -> {:ok, conversation}
     end
   end
 
-  defp validate_attachments(params) do
-    if params["attachments"] do
-      Enum.map(params["attachments"], fn url -> %{"url" => url} end)
-    else
-      []
+  @spec put_attachments(map()) :: map()
+  defp put_attachments(params) do
+    Map.update(params, "attachments", [], fn attachments ->
+      if attachments do
+        Enum.map(attachments, fn url -> %{"url" => url} end)
+      else
+        []
+      end
+    end)
+  end
+
+  defp get_provider(%{} = params) do
+    with {:ok, type} <- get_type(params) do
+      {:ok, Repo.one(from p in Provider, where: p.type == ^type and p.active)}
     end
   end
+
+  @spec get_type(map()) :: {:ok, atom()} | {:error, :invalid_type}
+  defp get_type(%{"type" => "sms"}), do: {:ok, :sms}
+  defp get_type(%{"type" => "mms"}), do: {:ok, :mms}
+  defp get_type(%{"type" => _}), do: {:error, :invalid_type}
+  defp get_type(%{}), do: {:ok, :email}
 end

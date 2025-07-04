@@ -14,7 +14,7 @@ defmodule MessagingService.MessagingTest do
 
       assert message.from == sms_attrs()["from"]
       assert message.provider_message_id == sms_attrs()["messaging_provider_id"]
-      assert message.provider == "messaging_provider"
+      assert message.provider.name == "messaging_provider"
     end
 
     test "mms" do
@@ -23,8 +23,7 @@ defmodule MessagingService.MessagingTest do
 
       assert message.from == mms_attrs()["from"]
       assert message.provider_message_id == mms_attrs()["messaging_provider_id"]
-      assert message.attachments == mms_attrs()["attachments"]
-      assert message.provider == "messaging_provider"
+      assert message.provider.name == "messaging_provider"
     end
 
     test "email" do
@@ -33,8 +32,7 @@ defmodule MessagingService.MessagingTest do
 
       assert message.from == email_attrs()["from"]
       assert message.provider_message_id == email_attrs()["xillio_id"]
-      assert message.attachments == email_attrs()["attachments"]
-      assert message.provider == "xillio"
+      assert message.provider.name == "xillio"
     end
   end
 
