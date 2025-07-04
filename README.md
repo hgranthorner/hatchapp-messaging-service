@@ -2,6 +2,38 @@
 
 This is a scaffold for Hatch's backend interview project. It includes basic setup for development, testing, and deployment.
 
+## Running Grant's submission
+
+### Requirements:
+
+- podman-compose or docker-compose (configurable via the `COMPOSE` variable with make)
+- elixir > 1.14
+
+### Setting up the application
+
+To create the database, install dependencies, run migrations, and seed initial data:
+```sh
+make setup
+```
+
+### Running the application
+
+```sh
+make run
+```
+
+### Running tests
+
+For running the hatch application tests (requires a running server):
+```sh
+make test
+```
+
+For running application tests:
+```sh
+mix test
+```
+
 ## Guidelines
 
 At Hatch, we work with several message providers to offer a unified way for our Customers to  communicate to their Contacts. Today we offer SMS, MMS, email, voice calls, and voicemail drops. Your task is to implement an HTTP service that supports the core messaging functionality of Hatch, on a much smaller scale. Specific instructions and guidelines on completing the project are below.
