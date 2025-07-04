@@ -5,14 +5,17 @@ defmodule MessagingServiceWeb.EmailController do
   action_fallback MessagingServiceWeb.FallbackController
 
   def incoming(conn, params) do
-    Messaging.insert_email(params)
-    send_resp(conn, 200, "OK")
+    with {:ok, message} <- Messaging.insert_email(params) do
+      json(conn, %{data: %{message_id: message.id}})
+    end
   end
 
   def outgoing(conn, params) do
     with {:ok, message} <- Messaging.insert_email(params) do
+      # NOTE(grant): In a production application, if this fails we would want to track that and update the status of the message
+      # and communicate that clearly to the user.
       Messaging.send_message_to_provider(message)
-      send_resp(conn, 200, "OK")
+      json(conn, %{data: %{message_id: message.id}})
     else
       {:error, changeset_or_reason} ->
         {:error, changeset_or_reason}
