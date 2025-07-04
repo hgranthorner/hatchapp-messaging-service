@@ -19,11 +19,15 @@ setup:
 	@echo "Setting up the project..."
 	@echo "Starting PostgreSQL database..."
 	@$(COMPOSE) up -d
-	@echo "Waiting for database to be ready..."
-	@sleep 5
-	@echo "Setup complete!"
+	@while ! $(COMPOSE) exec postgres pg_isready -U messaging_user -d messaging_service > /dev/null 2>&1; do \
+		echo "PostgreSQL is not yet ready, waiting..."; \
+		sleep 1; \
+	done
+	@echo "Database ready, setting up application..."
 	@mix deps.get
 	@mix ecto.migrate
+	@mix run priv/repo/seeds.exs
+	@echo "Setup complete!"
 
 run:
 	@echo "Running the application..."
@@ -31,7 +35,7 @@ run:
 
 # NOTE(grant): We need to be running the server already, so we probably
 # don't want to start the database again
-test: setup
+test:
 	@echo "Running tests..."
 	@./bin/test.sh
 
